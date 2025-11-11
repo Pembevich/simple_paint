@@ -1,7 +1,8 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, 
                              QHBoxLayout, QPushButton, QLabel, 
                              QSlider, QMenuBar, QStatusBar, 
-                             QMessageBox, QFileDialog, QColorDialog)
+                             QMessageBox, QFileDialog, QColorDialog,
+                             QSizePolicy)
 from PyQt6.QtCore import Qt, QPoint
 from PyQt6.QtGui import QAction, QPainter, QColor, QPen, QImage, QIcon
 from models.drawing_tools import BrushTool, LineTool, RectangleTool, EllipseTool, EraserTool
@@ -10,7 +11,7 @@ from utils.settings_manager import SettingsManager
 class CanvasWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.setMinimumSize(600, 400)
+        self.setMinimumSize(400, 300)
         self.image = QImage(self.size(), QImage.Format.Format_RGB32)
         self.image.fill(Qt.GlobalColor.white)
         self.drawing = False
@@ -31,17 +32,19 @@ class CanvasWidget(QWidget):
             self.start_point = event.pos()
 
     def mouseMoveEvent(self, event):
-        if self.drawing and self.current_tool.name == "brush":
+        if self.drawing:
             painter = QPainter(self.image)
-            self.current_tool.draw(painter, self.last_point, event.pos(), 
-                                 self.current_color, self.brush_size)
-            self.last_point = event.pos()
-            self.update()
+            # Для кисти и ластика рисуем сразу при движении
+            if self.current_tool.name in ["brush", "eraser"]:
+                self.current_tool.draw(painter, self.last_point, event.pos(), 
+                                     self.current_color, self.brush_size)
+                self.last_point = event.pos()
+                self.update()
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton and self.drawing:
-            # Для инструментов кроме кисти рисуем только при отпускании
-            if self.current_tool.name != "brush":
+            # Для остальных инструментов рисуем при отпускании
+            if self.current_tool.name not in ["brush", "eraser"]:
                 painter = QPainter(self.image)
                 self.current_tool.draw(painter, self.start_point, event.pos(),
                                      self.current_color, self.brush_size)
@@ -85,38 +88,17 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(main_layout)
         
         # Левая панель инструментов
-        tools_layout = QVBoxLayout()
+        tools_widget = QWidget()
+        tools_widget.setFixedWidth(120)  # Фиксированная ширина панели инструментов
+        tools_layout = QVBoxLayout(tools_widget)
         
-        # Кнопки инструментов с иконками
-        self.brush_btn = QPushButton()
-        self.brush_btn.setIcon(QIcon("images/brush_icon.png"))
-        self.brush_btn.setToolTip("Кисть")
-        self.brush_btn.setFixedSize(50, 50)
-        
-        self.line_btn = QPushButton()
-        self.line_btn.setIcon(QIcon("images/line_icon.png"))
-        self.line_btn.setToolTip("Линия")
-        self.line_btn.setFixedSize(50, 50)
-        
-        self.rect_btn = QPushButton()
-        self.rect_btn.setIcon(QIcon("images/rectangle_icon.png"))
-        self.rect_btn.setToolTip("Прямоугольник")
-        self.rect_btn.setFixedSize(50, 50)
-        
-        self.ellipse_btn = QPushButton()
-        self.ellipse_btn.setIcon(QIcon("images/ellipse_icon.png"))
-        self.ellipse_btn.setToolTip("Эллипс")
-        self.ellipse_btn.setFixedSize(50, 50)
-        
-        self.eraser_btn = QPushButton()
-        self.eraser_btn.setIcon(QIcon("images/eraser_icon.png"))
-        self.eraser_btn.setToolTip("Ластик")
-        self.eraser_btn.setFixedSize(50, 50)
-        
-        self.clear_btn = QPushButton()
-        self.clear_btn.setIcon(QIcon("images/clear_icon.png"))
-        self.clear_btn.setToolTip("Очистить холст")
-        self.clear_btn.setFixedSize(50, 50)
+        # Кнопки инструментов с иконками и надписями
+        self.brush_btn = self.create_tool_button("images/brush_icon.png", "Кисть")
+        self.line_btn = self.create_tool_button("images/line_icon.png", "Линия")
+        self.rect_btn = self.create_tool_button("images/rectangle_icon.png", "Прямоугольник")
+        self.ellipse_btn = self.create_tool_button("images/ellipse_icon.png", "Эллипс")
+        self.eraser_btn = self.create_tool_button("images/eraser_icon.png", "Ластик")
+        self.clear_btn = self.create_tool_button("images/clear_icon.png", "Очистить")
         
         tools_layout.addWidget(self.brush_btn)
         tools_layout.addWidget(self.line_btn)
@@ -127,32 +109,21 @@ class MainWindow(QMainWindow):
         tools_layout.addStretch()
         
         # Правая часть (холст и настройки)
-        right_layout = QVBoxLayout()
+        right_widget = QWidget()
+        right_layout = QVBoxLayout(right_widget)
         
         # Панель настроек
-        settings_layout = QHBoxLayout()
+        settings_widget = QWidget()
+        settings_widget.setFixedHeight(60)
+        settings_layout = QHBoxLayout(settings_widget)
+        
         settings_layout.addWidget(QLabel("Цвет:"))
         
         # Кнопки цветов
-        self.red_btn = QPushButton()
-        self.red_btn.setStyleSheet("background-color: red; border: 1px solid black;")
-        self.red_btn.setFixedSize(30, 30)
-        self.red_btn.setToolTip("Красный")
-        
-        self.blue_btn = QPushButton()
-        self.blue_btn.setStyleSheet("background-color: blue; border: 1px solid black;")
-        self.blue_btn.setFixedSize(30, 30)
-        self.blue_btn.setToolTip("Синий")
-        
-        self.green_btn = QPushButton()
-        self.green_btn.setStyleSheet("background-color: green; border: 1px solid black;")
-        self.green_btn.setFixedSize(30, 30)
-        self.green_btn.setToolTip("Зеленый")
-        
-        self.black_btn = QPushButton()
-        self.black_btn.setStyleSheet("background-color: black; border: 1px solid black;")
-        self.black_btn.setFixedSize(30, 30)
-        self.black_btn.setToolTip("Черный")
+        self.red_btn = self.create_color_button("red", "Красный")
+        self.blue_btn = self.create_color_button("blue", "Синий")
+        self.green_btn = self.create_color_button("green", "Зеленый")
+        self.black_btn = self.create_color_button("black", "Черный")
         
         self.custom_color_btn = QPushButton("Другой")
         self.custom_color_btn.setFixedSize(60, 30)
@@ -176,15 +147,15 @@ class MainWindow(QMainWindow):
         self.size_label = QLabel("5px")
         settings_layout.addWidget(self.size_label)
         
-        right_layout.addLayout(settings_layout)
+        right_layout.addWidget(settings_widget)
         
-        # Холст
+        # Холст (занимает всё оставшееся пространство)
         self.canvas = CanvasWidget()
         right_layout.addWidget(self.canvas)
         
         # Собираем основное окно
-        main_layout.addLayout(tools_layout)
-        main_layout.addLayout(right_layout)
+        main_layout.addWidget(tools_widget)
+        main_layout.addWidget(right_widget)
         
         # Строка состояния
         self.status_bar = QStatusBar()
@@ -196,6 +167,42 @@ class MainWindow(QMainWindow):
         
         # Подключаем сигналы
         self.connect_signals()
+    
+    def create_tool_button(self, icon_path, text):
+        """Создает кнопку инструмента с иконкой и текстом"""
+        button = QPushButton()
+        
+        # Вертикальный layout для кнопки
+        layout = QVBoxLayout()
+        layout.setContentsMargins(5, 5, 5, 5)
+        layout.setSpacing(2)
+        
+        # Иконка
+        icon_label = QLabel()
+        icon_label.setPixmap(QIcon(icon_path).pixmap(32, 32))
+        icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        # Текст
+        text_label = QLabel(text)
+        text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        text_label.setStyleSheet("font-size: 10px;")
+        
+        layout.addWidget(icon_label)
+        layout.addWidget(text_label)
+        
+        button.setLayout(layout)
+        button.setFixedSize(80, 60)
+        button.setToolTip(text)
+        
+        return button
+    
+    def create_color_button(self, color, tooltip):
+        """Создает кнопку цвета"""
+        button = QPushButton()
+        button.setStyleSheet(f"background-color: {color}; border: 1px solid black;")
+        button.setFixedSize(30, 30)
+        button.setToolTip(tooltip)
+        return button
     
     def create_menu(self):
         menubar = self.menuBar()
@@ -301,7 +308,6 @@ class MainWindow(QMainWindow):
         self.current_color = color
         self.canvas.set_color(color)
         self.update_status()
-        # Сохраняем цвет в настройках
         self.settings_manager.set_setting("last_color", 
                                          [color.red(), color.green(), color.blue()])
     
