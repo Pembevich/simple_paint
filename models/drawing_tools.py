@@ -1,5 +1,5 @@
 from PyQt6.QtGui import QPainter, QPen, QColor
-from PyQt6.QtCore import QPoint, QRect
+from PyQt6.QtCore import QPoint, QRect, Qt  # ← ДОБАВИЛ Qt
 
 class DrawingTool:
     def __init__(self):
@@ -14,7 +14,7 @@ class BrushTool(DrawingTool):
         self.name = "brush"
     
     def draw(self, painter, start_point, end_point, color, brush_size):
-        pen = QPen(color, brush_size, cap=Qt.PenCapStyle.RoundCap)
+        pen = QPen(color, brush_size, cap=Qt.PenCapStyle.RoundCap)  # ← Теперь Qt определен
         painter.setPen(pen)
         painter.drawLine(start_point, end_point)
 
