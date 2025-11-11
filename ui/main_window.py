@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout,
                              QSlider, QMenuBar, QStatusBar, 
                              QMessageBox, QFileDialog, QColorDialog)
 from PyQt6.QtCore import Qt, QPoint
-from PyQt6.QtGui import QAction, QPainter, QColor, QPen, QImage
+from PyQt6.QtGui import QAction, QPainter, QColor, QPen, QImage, QIcon
 from models.drawing_tools import BrushTool, LineTool, RectangleTool, EllipseTool, EraserTool
 from utils.settings_manager import SettingsManager
 
@@ -15,6 +15,7 @@ class CanvasWidget(QWidget):
         self.image.fill(Qt.GlobalColor.white)
         self.drawing = False
         self.last_point = QPoint()
+        self.start_point = QPoint()
         self.current_tool = BrushTool()
         self.current_color = QColor(0, 0, 0)
         self.brush_size = 5
@@ -27,9 +28,10 @@ class CanvasWidget(QWidget):
         if event.button() == Qt.MouseButton.LeftButton:
             self.drawing = True
             self.last_point = event.pos()
+            self.start_point = event.pos()
 
     def mouseMoveEvent(self, event):
-        if self.drawing:
+        if self.drawing and self.current_tool.name == "brush":
             painter = QPainter(self.image)
             self.current_tool.draw(painter, self.last_point, event.pos(), 
                                  self.current_color, self.brush_size)
@@ -37,7 +39,13 @@ class CanvasWidget(QWidget):
             self.update()
 
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton and self.drawing:
+            # Для инструментов кроме кисти рисуем только при отпускании
+            if self.current_tool.name != "brush":
+                painter = QPainter(self.image)
+                self.current_tool.draw(painter, self.start_point, event.pos(),
+                                     self.current_color, self.brush_size)
+                self.update()
             self.drawing = False
 
     def clear(self):
@@ -79,13 +87,36 @@ class MainWindow(QMainWindow):
         # Левая панель инструментов
         tools_layout = QVBoxLayout()
         
-        # Кнопки инструментов
-        self.brush_btn = QPushButton("Кисть")
-        self.line_btn = QPushButton("Линия")
-        self.rect_btn = QPushButton("Прямоугольник")
-        self.ellipse_btn = QPushButton("Эллипс")
-        self.eraser_btn = QPushButton("Ластик")
-        self.clear_btn = QPushButton("Очистить")
+        # Кнопки инструментов с иконками
+        self.brush_btn = QPushButton()
+        self.brush_btn.setIcon(QIcon("images/brush_icon.png"))
+        self.brush_btn.setToolTip("Кисть")
+        self.brush_btn.setFixedSize(50, 50)
+        
+        self.line_btn = QPushButton()
+        self.line_btn.setIcon(QIcon("images/line_icon.png"))
+        self.line_btn.setToolTip("Линия")
+        self.line_btn.setFixedSize(50, 50)
+        
+        self.rect_btn = QPushButton()
+        self.rect_btn.setIcon(QIcon("images/rectangle_icon.png"))
+        self.rect_btn.setToolTip("Прямоугольник")
+        self.rect_btn.setFixedSize(50, 50)
+        
+        self.ellipse_btn = QPushButton()
+        self.ellipse_btn.setIcon(QIcon("images/ellipse_icon.png"))
+        self.ellipse_btn.setToolTip("Эллипс")
+        self.ellipse_btn.setFixedSize(50, 50)
+        
+        self.eraser_btn = QPushButton()
+        self.eraser_btn.setIcon(QIcon("images/eraser_icon.png"))
+        self.eraser_btn.setToolTip("Ластик")
+        self.eraser_btn.setFixedSize(50, 50)
+        
+        self.clear_btn = QPushButton()
+        self.clear_btn.setIcon(QIcon("images/clear_icon.png"))
+        self.clear_btn.setToolTip("Очистить холст")
+        self.clear_btn.setFixedSize(50, 50)
         
         tools_layout.addWidget(self.brush_btn)
         tools_layout.addWidget(self.line_btn)
@@ -106,21 +137,26 @@ class MainWindow(QMainWindow):
         self.red_btn = QPushButton()
         self.red_btn.setStyleSheet("background-color: red; border: 1px solid black;")
         self.red_btn.setFixedSize(30, 30)
+        self.red_btn.setToolTip("Красный")
         
         self.blue_btn = QPushButton()
         self.blue_btn.setStyleSheet("background-color: blue; border: 1px solid black;")
         self.blue_btn.setFixedSize(30, 30)
+        self.blue_btn.setToolTip("Синий")
         
         self.green_btn = QPushButton()
         self.green_btn.setStyleSheet("background-color: green; border: 1px solid black;")
         self.green_btn.setFixedSize(30, 30)
+        self.green_btn.setToolTip("Зеленый")
         
         self.black_btn = QPushButton()
         self.black_btn.setStyleSheet("background-color: black; border: 1px solid black;")
         self.black_btn.setFixedSize(30, 30)
+        self.black_btn.setToolTip("Черный")
         
         self.custom_color_btn = QPushButton("Другой")
         self.custom_color_btn.setFixedSize(60, 30)
+        self.custom_color_btn.setToolTip("Выбрать другой цвет")
         
         settings_layout.addWidget(self.red_btn)
         settings_layout.addWidget(self.blue_btn)
@@ -134,6 +170,7 @@ class MainWindow(QMainWindow):
         self.size_slider = QSlider(Qt.Orientation.Horizontal)
         self.size_slider.setRange(1, 50)
         self.size_slider.setValue(5)
+        self.size_slider.setFixedWidth(100)
         settings_layout.addWidget(self.size_slider)
         
         self.size_label = QLabel("5px")
@@ -167,9 +204,13 @@ class MainWindow(QMainWindow):
         file_menu = menubar.addMenu("Файл")
         
         self.new_action = QAction("Новый", self)
+        self.new_action.setShortcut("Ctrl+N")
         self.open_action = QAction("Открыть", self)
+        self.open_action.setShortcut("Ctrl+O")
         self.save_action = QAction("Сохранить", self)
+        self.save_action.setShortcut("Ctrl+S")
         exit_action = QAction("Выход", self)
+        exit_action.setShortcut("Ctrl+Q")
         
         file_menu.addAction(self.new_action)
         file_menu.addAction(self.open_action)
@@ -180,6 +221,7 @@ class MainWindow(QMainWindow):
         # Меню Правка
         edit_menu = menubar.addMenu("Правка")
         self.clear_action = QAction("Очистить", self)
+        self.clear_action.setShortcut("Ctrl+Shift+N")
         edit_menu.addAction(self.clear_action)
         
         # Меню Справка
@@ -320,8 +362,10 @@ class MainWindow(QMainWindow):
                          "Разработано в рамках учебного проекта\n"
                          "Возможности:\n"
                          "- Рисование кистью\n" 
-                         "- Геометрические фигуры\n"
-                         "- Сохранение и загрузка изображений\n"
+                         "- Геометрические фигуры (линии, прямоугольники, эллипсы)\n"
+                         "- Ластик для исправлений\n"
+                         "- Сохранение в PNG, JPEG, BMP\n"
+                         "- Загрузка изображений для редактирования\n"
                          "- Сохранение настроек между запусками")
     
     def closeEvent(self, event):
