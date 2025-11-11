@@ -14,7 +14,7 @@ class BrushTool(DrawingTool):
         self.name = "brush"
     
     def draw(self, painter, start_point, end_point, color, brush_size):
-        pen = QPen(color, brush_size)
+        pen = QPen(color, brush_size, cap=Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
         painter.drawLine(start_point, end_point)
 
@@ -56,6 +56,7 @@ class EraserTool(DrawingTool):
         self.name = "eraser"
     
     def draw(self, painter, start_point, end_point, color, brush_size):
-        pen = QPen(QColor(255, 255, 255), brush_size)
+        # Ластик рисует белым цветом с круглыми концами
+        pen = QPen(QColor(255, 255, 255), brush_size, cap=Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
         painter.drawLine(start_point, end_point)
