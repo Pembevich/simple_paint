@@ -9,6 +9,7 @@
 4. ui/color_picker.py - выбор цвета
 5. models/drawing_model.py - логика рисования
 6. utils/file_operations.py - работа с файлами
+7. utils/settings_manager.py - настройка программы
 
 ### Пользователи программы:
 Программа предназначена для одного пользователя. Все данные хранятся локально на компьютере.
@@ -32,7 +33,8 @@ simple_paint/
 ├── models/                      # Папка с моделями данных
 │   └── drawing_model.py         # Логика рисования и инструменты
 ├── utils/                       # Вспомогательные модули
-│   └── file_operations.py       # Работа с файлами
+│   ├── file_operations.py       # Работа с файлами
+│   └── settings_manager.py      # Настройки программы
 ├── images/                      # Папка для иконок и картинок
 │   ├── brush_icon.png
 │   ├── line_icon.png
