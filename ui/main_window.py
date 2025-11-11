@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout,
 from PyQt6.QtCore import Qt, QPoint
 from PyQt6.QtGui import QAction, QPainter, QColor, QPen, QImage
 from models.drawing_tools import BrushTool, LineTool, RectangleTool, EllipseTool, EraserTool
+from utils.settings_manager import SettingsManager
 
 class CanvasWidget(QWidget):
     def __init__(self):
@@ -55,6 +56,7 @@ class CanvasWidget(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.settings_manager = SettingsManager()
         self.setWindowTitle("SimplePaint")
         self.setGeometry(100, 100, 800, 600)
         
@@ -63,6 +65,7 @@ class MainWindow(QMainWindow):
         self.current_tool = "brush"
         
         self.setup_ui()
+        self.load_settings()
         
     def setup_ui(self):
         # Центральный виджет
@@ -213,6 +216,30 @@ class MainWindow(QMainWindow):
         self.save_action.triggered.connect(self.save_file)
         self.clear_action.triggered.connect(self.clear_canvas)
     
+    def load_settings(self):
+        """Загружает настройки при запуске"""
+        # Загрузка размера окна
+        size = self.settings_manager.get_setting("window_size")
+        if size:
+            self.resize(size[0], size[1])
+        
+        # Загрузка последнего инструмента
+        last_tool = self.settings_manager.get_setting("last_tool")
+        if last_tool:
+            self.set_tool(last_tool)
+        
+        # Загрузка последнего цвета
+        last_color = self.settings_manager.get_setting("last_color")
+        if last_color:
+            color = QColor(last_color[0], last_color[1], last_color[2])
+            self.set_color(color)
+        
+        # Загрузка размера кисти
+        brush_size = self.settings_manager.get_setting("brush_size")
+        if brush_size:
+            self.set_brush_size(brush_size)
+            self.size_slider.setValue(brush_size)
+    
     def set_tool(self, tool):
         self.current_tool = tool
         if tool == "brush":
@@ -226,17 +253,22 @@ class MainWindow(QMainWindow):
         elif tool == "eraser":
             self.canvas.set_tool(EraserTool())
         self.update_status()
+        self.settings_manager.set_setting("last_tool", tool)
     
     def set_color(self, color):
         self.current_color = color
         self.canvas.set_color(color)
         self.update_status()
+        # Сохраняем цвет в настройках
+        self.settings_manager.set_setting("last_color", 
+                                         [color.red(), color.green(), color.blue()])
     
     def set_brush_size(self, size):
         self.brush_size = size
         self.size_label.setText(f"{size}px")
         self.canvas.set_brush_size(size)
         self.update_status()
+        self.settings_manager.set_setting("brush_size", size)
     
     def update_status(self):
         color_name = self.get_color_name()
@@ -289,4 +321,16 @@ class MainWindow(QMainWindow):
                          "Возможности:\n"
                          "- Рисование кистью\n" 
                          "- Геометрические фигуры\n"
-                         "- Сохранение и загрузка изображений")
+                         "- Сохранение и загрузка изображений\n"
+                         "- Сохранение настроек между запусками")
+    
+    def closeEvent(self, event):
+        """Сохраняет настройки при закрытии"""
+        self.settings_manager.set_setting("window_size", [self.width(), self.height()])
+        self.settings_manager.set_setting("last_tool", self.current_tool)
+        self.settings_manager.set_setting("last_color", 
+                                         [self.current_color.red(), 
+                                          self.current_color.green(), 
+                                          self.current_color.blue()])
+        self.settings_manager.set_setting("brush_size", self.brush_size)
+        event.accept()
