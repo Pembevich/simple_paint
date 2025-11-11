@@ -1,8 +1,56 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, 
                              QHBoxLayout, QPushButton, QLabel, 
-                             QSlider, QMenuBar, QStatusBar)
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction, QPainter, QColor
+                             QSlider, QMenuBar, QStatusBar, 
+                             QMessageBox, QFileDialog, QColorDialog)
+from PyQt6.QtCore import Qt, QPoint
+from PyQt6.QtGui import QAction, QPainter, QColor, QPen, QImage
+from models.drawing_tools import BrushTool, LineTool, RectangleTool, EllipseTool, EraserTool
+
+class CanvasWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setMinimumSize(600, 400)
+        self.image = QImage(self.size(), QImage.Format.Format_RGB32)
+        self.image.fill(Qt.GlobalColor.white)
+        self.drawing = False
+        self.last_point = QPoint()
+        self.current_tool = BrushTool()
+        self.current_color = QColor(0, 0, 0)
+        self.brush_size = 5
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.drawImage(self.rect(), self.image, self.rect())
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.drawing = True
+            self.last_point = event.pos()
+
+    def mouseMoveEvent(self, event):
+        if self.drawing:
+            painter = QPainter(self.image)
+            self.current_tool.draw(painter, self.last_point, event.pos(), 
+                                 self.current_color, self.brush_size)
+            self.last_point = event.pos()
+            self.update()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.drawing = False
+
+    def clear(self):
+        self.image.fill(Qt.GlobalColor.white)
+        self.update()
+
+    def set_tool(self, tool):
+        self.current_tool = tool
+
+    def set_color(self, color):
+        self.current_color = color
+
+    def set_brush_size(self, size):
+        self.brush_size = size
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -10,7 +58,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("SimplePaint")
         self.setGeometry(100, 100, 800, 600)
         
-        self.current_color = QColor(0, 0, 0)  # Черный по умолчанию
+        self.current_color = QColor(0, 0, 0)
         self.brush_size = 5
         self.current_tool = "brush"
         
@@ -34,12 +82,14 @@ class MainWindow(QMainWindow):
         self.rect_btn = QPushButton("Прямоугольник")
         self.ellipse_btn = QPushButton("Эллипс")
         self.eraser_btn = QPushButton("Ластик")
+        self.clear_btn = QPushButton("Очистить")
         
         tools_layout.addWidget(self.brush_btn)
         tools_layout.addWidget(self.line_btn)
         tools_layout.addWidget(self.rect_btn)
         tools_layout.addWidget(self.ellipse_btn)
         tools_layout.addWidget(self.eraser_btn)
+        tools_layout.addWidget(self.clear_btn)
         tools_layout.addStretch()
         
         # Правая часть (холст и настройки)
@@ -51,25 +101,29 @@ class MainWindow(QMainWindow):
         
         # Кнопки цветов
         self.red_btn = QPushButton()
-        self.red_btn.setStyleSheet("background-color: red;")
+        self.red_btn.setStyleSheet("background-color: red; border: 1px solid black;")
         self.red_btn.setFixedSize(30, 30)
         
         self.blue_btn = QPushButton()
-        self.blue_btn.setStyleSheet("background-color: blue;")
+        self.blue_btn.setStyleSheet("background-color: blue; border: 1px solid black;")
         self.blue_btn.setFixedSize(30, 30)
         
         self.green_btn = QPushButton()
-        self.green_btn.setStyleSheet("background-color: green;")
+        self.green_btn.setStyleSheet("background-color: green; border: 1px solid black;")
         self.green_btn.setFixedSize(30, 30)
         
         self.black_btn = QPushButton()
-        self.black_btn.setStyleSheet("background-color: black;")
+        self.black_btn.setStyleSheet("background-color: black; border: 1px solid black;")
         self.black_btn.setFixedSize(30, 30)
+        
+        self.custom_color_btn = QPushButton("Другой")
+        self.custom_color_btn.setFixedSize(60, 30)
         
         settings_layout.addWidget(self.red_btn)
         settings_layout.addWidget(self.blue_btn)
         settings_layout.addWidget(self.green_btn)
         settings_layout.addWidget(self.black_btn)
+        settings_layout.addWidget(self.custom_color_btn)
         settings_layout.addStretch()
         
         # Слайдер размера кисти
@@ -84,9 +138,8 @@ class MainWindow(QMainWindow):
         
         right_layout.addLayout(settings_layout)
         
-        # Холст (пока просто виджет)
-        self.canvas = QWidget()
-        self.canvas.setStyleSheet("background-color: white; border: 1px solid gray;")
+        # Холст
+        self.canvas = CanvasWidget()
         right_layout.addWidget(self.canvas)
         
         # Собираем основное окно
@@ -110,26 +163,30 @@ class MainWindow(QMainWindow):
         # Меню Файл
         file_menu = menubar.addMenu("Файл")
         
-        new_action = QAction("Новый", self)
-        open_action = QAction("Открыть", self)
-        save_action = QAction("Сохранить", self)
+        self.new_action = QAction("Новый", self)
+        self.open_action = QAction("Открыть", self)
+        self.save_action = QAction("Сохранить", self)
         exit_action = QAction("Выход", self)
         
-        file_menu.addAction(new_action)
-        file_menu.addAction(open_action)
-        file_menu.addAction(save_action)
+        file_menu.addAction(self.new_action)
+        file_menu.addAction(self.open_action)
+        file_menu.addAction(self.save_action)
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
         
         # Меню Правка
         edit_menu = menubar.addMenu("Правка")
-        clear_action = QAction("Очистить", self)
-        edit_menu.addAction(clear_action)
+        self.clear_action = QAction("Очистить", self)
+        edit_menu.addAction(self.clear_action)
         
         # Меню Справка
         help_menu = menubar.addMenu("Справка")
         about_action = QAction("О программе", self)
         help_menu.addAction(about_action)
+        
+        # Подключаем выход и о программе
+        exit_action.triggered.connect(self.close)
+        about_action.triggered.connect(self.show_about)
     
     def connect_signals(self):
         # Инструменты
@@ -138,29 +195,47 @@ class MainWindow(QMainWindow):
         self.rect_btn.clicked.connect(lambda: self.set_tool("rectangle"))
         self.ellipse_btn.clicked.connect(lambda: self.set_tool("ellipse"))
         self.eraser_btn.clicked.connect(lambda: self.set_tool("eraser"))
+        self.clear_btn.clicked.connect(self.clear_canvas)
         
         # Цвета
         self.red_btn.clicked.connect(lambda: self.set_color(QColor(255, 0, 0)))
         self.blue_btn.clicked.connect(lambda: self.set_color(QColor(0, 0, 255)))
         self.green_btn.clicked.connect(lambda: self.set_color(QColor(0, 255, 0)))
         self.black_btn.clicked.connect(lambda: self.set_color(QColor(0, 0, 0)))
+        self.custom_color_btn.clicked.connect(self.choose_custom_color)
         
         # Размер кисти
         self.size_slider.valueChanged.connect(self.set_brush_size)
+        
+        # Меню
+        self.new_action.triggered.connect(self.new_file)
+        self.open_action.triggered.connect(self.open_file)
+        self.save_action.triggered.connect(self.save_file)
+        self.clear_action.triggered.connect(self.clear_canvas)
     
     def set_tool(self, tool):
         self.current_tool = tool
+        if tool == "brush":
+            self.canvas.set_tool(BrushTool())
+        elif tool == "line":
+            self.canvas.set_tool(LineTool())
+        elif tool == "rectangle":
+            self.canvas.set_tool(RectangleTool())
+        elif tool == "ellipse":
+            self.canvas.set_tool(EllipseTool())
+        elif tool == "eraser":
+            self.canvas.set_tool(EraserTool())
         self.update_status()
-        print(f"Выбран инструмент: {tool}")  # Для отладки
     
     def set_color(self, color):
         self.current_color = color
+        self.canvas.set_color(color)
         self.update_status()
-        print(f"Выбран цвет: {color.getRgb()}")  # Для отладки
     
     def set_brush_size(self, size):
         self.brush_size = size
         self.size_label.setText(f"{size}px")
+        self.canvas.set_brush_size(size)
         self.update_status()
     
     def update_status(self):
@@ -178,3 +253,40 @@ class MainWindow(QMainWindow):
             return "черный"
         else:
             return "пользовательский"
+    
+    def new_file(self):
+        """Создает новый файл"""
+        self.canvas.clear()
+    
+    def open_file(self):
+        """Открывает изображение"""
+        from utils.file_manager import FileManager
+        image = FileManager.load_image(self)
+        if image:
+            self.canvas.image = image.scaled(self.canvas.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            self.canvas.update()
+    
+    def save_file(self):
+        """Сохраняет изображение"""
+        from utils.file_manager import FileManager
+        FileManager.save_image(self.canvas.image, self)
+    
+    def clear_canvas(self):
+        """Очищает холст"""
+        self.canvas.clear()
+    
+    def choose_custom_color(self):
+        """Выбор произвольного цвета"""
+        color = QColorDialog.getColor()
+        if color.isValid():
+            self.set_color(color)
+    
+    def show_about(self):
+        """Показывает окно 'О программе'"""
+        QMessageBox.about(self, "О программе SimplePaint", 
+                         "SimplePaint - простой графический редактор\n\n"
+                         "Разработано в рамках учебного проекта\n"
+                         "Возможности:\n"
+                         "- Рисование кистью\n" 
+                         "- Геометрические фигуры\n"
+                         "- Сохранение и загрузка изображений")
