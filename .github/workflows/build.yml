@@ -19,14 +19,9 @@ jobs:
       run: |
         pip install PyQt6 pyinstaller
         
-    - name: Build EXE with hidden imports
+    - name: Build EXE
       run: |
-        pyinstaller --onefile --windowed --name SimplePaint ^
-          --hidden-import=pkgutil ^
-          --hidden-import=PyQt6.QtWidgets ^
-          --hidden-import=PyQt6.QtCore ^
-          --hidden-import=PyQt6.QtGui ^
-          main.py
+        pyinstaller --onefile --windowed --name SimplePaint --hidden-import=pkgutil --hidden-import=PyQt6.QtWidgets --hidden-import=PyQt6.QtCore --hidden-import=PyQt6.QtGui main.py
         
     - name: Upload EXE
       uses: actions/upload-artifact@v4
