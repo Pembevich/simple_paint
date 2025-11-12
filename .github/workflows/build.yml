@@ -1,9 +1,6 @@
-name: Build Executables
+name: Build SimplePaint EXE
 
-on:
-  push:
-    tags:
-      - 'v*'
+on: 
   workflow_dispatch:
 
 jobs:
@@ -20,15 +17,19 @@ jobs:
         
     - name: Install dependencies
       run: |
-        pip install -r requirements.txt
-        pip install pyinstaller
+        pip install PyQt6 pyinstaller
         
-    - name: Build Windows EXE
+    - name: Build EXE with hidden imports
       run: |
-        pyinstaller --onefile --windowed --name SimplePaint main.py
+        pyinstaller --onefile --windowed --name SimplePaint ^
+          --hidden-import=pkgutil ^
+          --hidden-import=PyQt6.QtWidgets ^
+          --hidden-import=PyQt6.QtCore ^
+          --hidden-import=PyQt6.QtGui ^
+          main.py
         
-    - name: Upload Windows EXE
+    - name: Upload EXE
       uses: actions/upload-artifact@v4
       with:
-        name: SimplePaint-Windows
+        name: SimplePaint-Windows-Fixed
         path: dist/SimplePaint.exe
