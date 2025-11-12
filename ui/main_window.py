@@ -7,67 +7,17 @@ from PyQt6.QtCore import Qt, QPoint
 from PyQt6.QtGui import QAction, QPainter, QColor, QPen, QImage, QIcon
 from models.drawing_tools import BrushTool, LineTool, RectangleTool, EllipseTool, EraserTool
 from utils.settings_manager import SettingsManager
+from utils.database import DatabaseManager
+from ui.canvas_widget import CanvasWidget
+from ui.about_dialog import AboutDialog
 
-class CanvasWidget(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setMinimumSize(400, 300)
-        self.image = QImage(self.size(), QImage.Format.Format_RGB32)
-        self.image.fill(Qt.GlobalColor.white)
-        self.drawing = False
-        self.last_point = QPoint()
-        self.start_point = QPoint()
-        self.current_tool = BrushTool()
-        self.current_color = QColor(0, 0, 0)
-        self.brush_size = 5
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.drawImage(self.rect(), self.image, self.rect())
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.drawing = True
-            self.last_point = event.pos()
-            self.start_point = event.pos()
-
-    def mouseMoveEvent(self, event):
-        if self.drawing:
-            painter = QPainter(self.image)
-            # Для кисти и ластика рисуем сразу при движении
-            if self.current_tool.name in ["brush", "eraser"]:
-                self.current_tool.draw(painter, self.last_point, event.pos(), 
-                                     self.current_color, self.brush_size)
-                self.last_point = event.pos()
-                self.update()
-
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton and self.drawing:
-            # Для остальных инструментов рисуем при отпускании
-            if self.current_tool.name not in ["brush", "eraser"]:
-                painter = QPainter(self.image)
-                self.current_tool.draw(painter, self.start_point, event.pos(),
-                                     self.current_color, self.brush_size)
-                self.update()
-            self.drawing = False
-
-    def clear(self):
-        self.image.fill(Qt.GlobalColor.white)
-        self.update()
-
-    def set_tool(self, tool):
-        self.current_tool = tool
-
-    def set_color(self, color):
-        self.current_color = color
-
-    def set_brush_size(self, size):
-        self.brush_size = size
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.settings_manager = SettingsManager()
+        self.db_manager = DatabaseManager()
+        self.current_session_id = self.db_manager.start_session()
         self.setWindowTitle("SimplePaint")
         self.setGeometry(100, 100, 800, 600)
         
@@ -303,6 +253,14 @@ class MainWindow(QMainWindow):
             self.canvas.set_tool(EraserTool())
         self.update_status()
         self.settings_manager.set_setting("last_tool", tool)
+        
+        # Логируем смену инструмента в БД
+        self.db_manager.log_action(
+            self.current_session_id, 
+            tool, 
+            self.current_color, 
+            self.brush_size
+        )
     
     def set_color(self, color):
         self.current_color = color
@@ -363,16 +321,8 @@ class MainWindow(QMainWindow):
     
     def show_about(self):
         """Показывает окно 'О программе'"""
-        QMessageBox.about(self, "О программе SimplePaint", 
-                         "SimplePaint - простой графический редактор\n\n"
-                         "Разработано в рамках учебного проекта\n"
-                         "Возможности:\n"
-                         "- Рисование кистью\n" 
-                         "- Геометрические фигуры (линии, прямоугольники, эллипсы)\n"
-                         "- Ластик для исправлений\n"
-                         "- Сохранение в PNG, JPEG, BMP\n"
-                         "- Загрузка изображений для редактирования\n"
-                         "- Сохранение настроек между запусками")
+        dialog = AboutDialog(self)
+        dialog.exec()
     
     def closeEvent(self, event):
         """Сохраняет настройки при закрытии"""
@@ -383,4 +333,9 @@ class MainWindow(QMainWindow):
                                           self.current_color.green(), 
                                           self.current_color.blue()])
         self.settings_manager.set_setting("brush_size", self.brush_size)
+        
+        # Завершаем сессию в БД
+        self.db_manager.end_session(self.current_session_id)
+        self.db_manager.close()
+        
         event.accept()
