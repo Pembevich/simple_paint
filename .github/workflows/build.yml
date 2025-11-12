@@ -19,12 +19,15 @@ jobs:
       run: |
         pip install PyQt6 pyinstaller
         
-    - name: Build EXE
+    - name: Build EXE with Qt binaries
       run: |
-        pyinstaller --onefile --windowed --name SimplePaint --hidden-import=pkgutil --hidden-import=PyQt6.QtWidgets --hidden-import=PyQt6.QtCore --hidden-import=PyQt6.QtGui main.py
+        pyinstaller --onefile --windowed --name SimplePaint ^
+          --collect-all PyQt6 ^
+          --paths "C:\hostedtoolcache\windows\Python\3.9.*\x64\Lib\site-packages\PyQt6" ^
+          main.py
         
     - name: Upload EXE
       uses: actions/upload-artifact@v4
       with:
-        name: SimplePaint-Windows-Fixed
+        name: SimplePaint-Windows
         path: dist/SimplePaint.exe
