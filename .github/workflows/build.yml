@@ -19,11 +19,13 @@ jobs:
       run: |
         pip install PyQt6 pyinstaller
         
-    - name: Build EXE with Qt binaries
+    - name: Find Qt paths and build
       run: |
+        python -c "import PyQt6; print(PyQt6.__file__)"
         pyinstaller --onefile --windowed --name SimplePaint ^
-          --collect-all PyQt6 ^
-          --paths "C:\hostedtoolcache\windows\Python\3.9.*\x64\Lib\site-packages\PyQt6" ^
+          --collect-binaries PyQt6 ^
+          --collect-data PyQt6 ^
+          --collect-submodules PyQt6 ^
           main.py
         
     - name: Upload EXE
