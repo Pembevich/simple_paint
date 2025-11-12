@@ -22,11 +22,7 @@ jobs:
     - name: Find Qt paths and build
       run: |
         python -c "import PyQt6; print(PyQt6.__file__)"
-        pyinstaller --onefile --windowed --name SimplePaint ^
-          --collect-binaries PyQt6 ^
-          --collect-data PyQt6 ^
-          --collect-submodules PyQt6 ^
-          main.py
+        pyinstaller --onefile --windowed --name SimplePaint --collect-binaries PyQt6 --collect-data PyQt6 --collect-submodules PyQt6 main.py
         
     - name: Upload EXE
       uses: actions/upload-artifact@v4
