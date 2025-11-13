@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt, QPoint
-from PyQt6.QtGui import QPainter, QColor, QPen, QImage
+from PyQt6.QtGui import QPainter, QColor, QPen, QImage, QCursor
+from PyQt6.QtCore import Qt
 from models.drawing_tools import BrushTool, LineTool, RectangleTool, EllipseTool, EraserTool
 
 
@@ -17,6 +18,9 @@ class CanvasWidget(QWidget):
         self.current_color = QColor(0, 0, 0)
         self.brush_size = 5
         self.temp_image = None  # Для временного предпросмотра
+        
+        # Устанавливаем курсор по умолчанию
+        self.update_cursor()
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -73,9 +77,34 @@ class CanvasWidget(QWidget):
 
     def set_tool(self, tool):
         self.current_tool = tool
+        self.update_cursor()
 
     def set_color(self, color):
         self.current_color = color
 
     def set_brush_size(self, size):
         self.brush_size = size
+
+    def update_cursor(self):
+        """Обновляет курсор в зависимости от выбранного инструмента"""
+        if self.current_tool.name == "brush":
+            # Создаем курсор кисти (крестик)
+            pixmap = QImage(32, 32, QImage.Format.Format_ARGB32)
+            pixmap.fill(Qt.GlobalColor.transparent)
+            painter = QPainter(pixmap)
+            painter.setPen(QPen(QColor(0, 0, 0), 2))
+            painter.drawLine(16, 0, 16, 32)  # Вертикальная линия
+            painter.drawLine(0, 16, 32, 16)  # Горизонтальная линия
+            painter.end()
+            cursor = QCursor(pixmap, 16, 16)  # Центр курсора
+        elif self.current_tool.name == "eraser":
+            # Курсор круга для ластика
+            self.setCursor(Qt.CursorShape.CrossCursor)
+        elif self.current_tool.name == "line":
+            self.setCursor(Qt.CursorShape.CrossCursor)
+        elif self.current_tool.name == "rectangle":
+            self.setCursor(Qt.CursorShape.CrossCursor)
+        elif self.current_tool.name == "ellipse":
+            self.setCursor(Qt.CursorShape.CrossCursor)
+        else:
+            self.setCursor(Qt.CursorShape.ArrowCursor)
