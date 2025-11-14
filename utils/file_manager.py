@@ -4,7 +4,7 @@ import os
 
 class FileManager:
     @staticmethod
-    def save_image(image, parent_window):
+    def save_image(image, parent_window, session_id=None, db_manager=None):
         """Сохраняет изображение в файл"""
         try:
             filename, selected_filter = QFileDialog.getSaveFileName(
@@ -16,7 +16,7 @@ class FileManager:
             
             if filename:
                 # Определяем формат по расширению
-                format_name = "PNG"  # по умолчанию
+                format_name = "PNG"
                 if filename.lower().endswith('.jpg') or filename.lower().endswith('.jpeg'):
                     format_name = "JPEG"
                 elif filename.lower().endswith('.bmp'):
@@ -24,6 +24,11 @@ class FileManager:
                 
                 success = image.save(filename, format_name)
                 if success:
+                    # Логируем сохранение в БД
+                    if session_id and db_manager:
+                        file_size = os.path.getsize(filename) if os.path.exists(filename) else 0
+                        db_manager.log_file_save(session_id, filename, format_name, file_size)
+                    
                     QMessageBox.information(parent_window, "Успех", f"Изображение сохранено как {format_name}!")
                     return True
                 else:
