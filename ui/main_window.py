@@ -10,6 +10,7 @@ from utils.settings_manager import SettingsManager
 from utils.database import DatabaseManager
 from ui.canvas_widget import CanvasWidget
 from ui.about_dialog import AboutDialog
+from ui.stats_dialog import StatsDialog
 
 
 class MainWindow(QMainWindow):
@@ -40,7 +41,7 @@ class MainWindow(QMainWindow):
         # Левая панель инструментов
         tools_widget = QWidget()
         tools_widget.setFixedWidth(120)
-        tools_widget.setProperty("toolPanel", "true")  # Для стилизации
+        tools_widget.setProperty("toolPanel", "true")
         tools_layout = QVBoxLayout(tools_widget)
         
         # Кнопки инструментов с иконками и надписями
@@ -144,8 +145,8 @@ class MainWindow(QMainWindow):
         button.setLayout(layout)
         button.setFixedSize(80, 60)
         button.setToolTip(text)
-        button.setCheckable(True)  # Делаем кнопку переключаемой
-        button.setProperty("toolButton", "true")  # Для стилизации QSS
+        button.setCheckable(True)
+        button.setProperty("toolButton", "true")
         
         return button
     
@@ -155,7 +156,7 @@ class MainWindow(QMainWindow):
         button.setStyleSheet(f"background-color: {color};")
         button.setFixedSize(30, 30)
         button.setToolTip(tooltip)
-        button.setProperty("colorButton", "true")  # Для стилизации QSS
+        button.setProperty("colorButton", "true")
         return button
     
     def create_menu(self):
@@ -188,11 +189,16 @@ class MainWindow(QMainWindow):
         # Меню Справка
         help_menu = menubar.addMenu("Справка")
         about_action = QAction("О программе", self)
+        stats_action = QAction("Статистика", self)
+        stats_action.setShortcut("Ctrl+T")
+        
         help_menu.addAction(about_action)
+        help_menu.addAction(stats_action)
         
         # Подключаем выход и о программе
         exit_action.triggered.connect(self.close)
         about_action.triggered.connect(self.show_about)
+        stats_action.triggered.connect(self.show_stats)
     
     def connect_signals(self):
         # Инструменты
@@ -325,7 +331,7 @@ class MainWindow(QMainWindow):
     def save_file(self):
         """Сохраняет изображение"""
         from utils.file_manager import FileManager
-        FileManager.save_image(self.canvas.image, self)
+        FileManager.save_image(self.canvas.image, self, self.current_session_id, self.db_manager)
     
     def clear_canvas(self):
         """Очищает холст"""
@@ -340,6 +346,11 @@ class MainWindow(QMainWindow):
     def show_about(self):
         """Показывает окно 'О программе'"""
         dialog = AboutDialog(self)
+        dialog.exec()
+    
+    def show_stats(self):
+        """Показывает окно статистики"""
+        dialog = StatsDialog(self)
         dialog.exec()
     
     def closeEvent(self, event):
