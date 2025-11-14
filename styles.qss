@@ -1,0 +1,138 @@
+/* Стиль для кнопок инструментов */
+QPushButton[toolButton="true"] {
+    background-color: #f0f0f0;
+    border: 0px;
+    color: #242424;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 6px 16px;
+    font-weight: 600;
+    text-shadow: 0 1px 0 #fff;
+    
+    /* Множественные тени для 3D эффекта */
+    box-shadow: 
+        inset 0 1px 0 0 #f4f4f4,
+        0 1px 0 0 #efefef,
+        0 2px 0 0 #ececec,
+        0 4px 0 0 #e0e0e0,
+        0 5px 0 0 #dedede,
+        0 6px 0 0 #dcdcdc,
+        0 7px 0 0 #cacaca,
+        0 7px 8px 0 #cecece;
+}
+
+QPushButton[toolButton="true"]:hover {
+    background-color: #f8f8f8;
+}
+
+QPushButton[toolButton="true"]:pressed {
+    background-color: #e8e8e8;
+    /* Сдвиг и уменьшение теней при нажатии */
+    position: relative;
+    top: 4px;
+    box-shadow: 
+        inset 0 1px 0 0 #f4f4f4,
+        0 1px 0 0 #efefef,
+        0 2px 0 0 #ececec,
+        0 3px 0 0 #e0e0e0,
+        0 3px 0 0 #dedede,
+        0 4px 0 0 #dcdcdc,
+        0 4px 0 0 #cacaca,
+        0 4px 6px 0 #cecece;
+}
+
+QPushButton[toolButton="true"]:checked {
+    background-color: #0078d7;
+    color: white;
+    text-shadow: 0 1px 0 #005a9e;
+    box-shadow: 
+        inset 0 1px 0 0 #0098ff,
+        0 1px 0 0 #0066b4,
+        0 2px 0 0 #005a9e,
+        0 4px 0 0 #004d84,
+        0 5px 0 0 #004170,
+        0 6px 0 0 #00385c,
+        0 7px 0 0 #002f48,
+        0 7px 8px 0 #003c5c;
+}
+
+QPushButton[toolButton="true"]:checked:pressed {
+    background-color: #0066b4;
+    top: 4px;
+    box-shadow: 
+        inset 0 1px 0 0 #0088ff,
+        0 1px 0 0 #005a9e,
+        0 2px 0 0 #004d84,
+        0 3px 0 0 #004170,
+        0 3px 0 0 #00385c,
+        0 4px 0 0 #002f48,
+        0 4px 0 0 #00263a,
+        0 4px 6px 0 #003c5c;
+}
+
+/* Кнопки цветов */
+QPushButton[colorButton="true"] {
+    border: 2px solid #cccccc;
+    border-radius: 4px;
+    min-width: 30px;
+    min-height: 30px;
+    max-width: 30px;
+    max-height: 30px;
+}
+
+QPushButton[colorButton="true"]:hover {
+    border: 2px solid #999999;
+}
+
+/* Обычные кнопки (Сохранить, Открыть и т.д.) */
+QPushButton {
+    background-color: #f0f0f0;
+    border: 0px;
+    color: #242424;
+    border-radius: 6px;
+    font-size: 13px;
+    padding: 5px 12px;
+    font-weight: 500;
+    text-shadow: 0 1px 0 #fff;
+    box-shadow: 
+        inset 0 1px 0 0 #f4f4f4,
+        0 1px 0 0 #efefef,
+        0 2px 0 0 #ececec,
+        0 3px 0 0 #e0e0e0,
+        0 3px 0 0 #dedede,
+        0 4px 0 0 #dcdcdc,
+        0 5px 0 0 #cacaca,
+        0 5px 6px 0 #cecece;
+}
+
+QPushButton:hover {
+    background-color: #f8f8f8;
+}
+
+QPushButton:pressed {
+    background-color: #e8e8e8;
+    position: relative;
+    top: 3px;
+    box-shadow: 
+        inset 0 1px 0 0 #f4f4f4,
+        0 1px 0 0 #efefef,
+        0 1px 0 0 #ececec,
+        0 2px 0 0 #e0e0e0,
+        0 2px 0 0 #dedede,
+        0 3px 0 0 #dcdcdc,
+        0 3px 0 0 #cacaca,
+        0 3px 4px 0 #cecece;
+}
+
+/* Главное окно */
+QMainWindow {
+    background-color: #f5f5f5;
+}
+
+/* Холст */
+CanvasWidget {
+    background-color: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+}
+/* ВСЕ КОММЕНТАРИИ НУЖНЫ ИСКЛЮЧИТЕЛЬНО ДЛЯ МЕНЯ ЧТОБЫ В БУДУЩЕМ НЕ ЗАПУТАТЬСЯ */
