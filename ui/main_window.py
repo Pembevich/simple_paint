@@ -39,7 +39,8 @@ class MainWindow(QMainWindow):
         
         # Левая панель инструментов
         tools_widget = QWidget()
-        tools_widget.setFixedWidth(120)  # Фиксированная ширина панели инструментов
+        tools_widget.setFixedWidth(120)
+        tools_widget.setProperty("toolPanel", "true")  # Для стилизации
         tools_layout = QVBoxLayout(tools_widget)
         
         # Кнопки инструментов с иконками и надписями
@@ -143,15 +144,18 @@ class MainWindow(QMainWindow):
         button.setLayout(layout)
         button.setFixedSize(80, 60)
         button.setToolTip(text)
+        button.setCheckable(True)  # Делаем кнопку переключаемой
+        button.setProperty("toolButton", "true")  # Для стилизации QSS
         
         return button
     
     def create_color_button(self, color, tooltip):
         """Создает кнопку цвета"""
         button = QPushButton()
-        button.setStyleSheet(f"background-color: {color}; border: 1px solid black;")
+        button.setStyleSheet(f"background-color: {color};")
         button.setFixedSize(30, 30)
         button.setToolTip(tooltip)
+        button.setProperty("colorButton", "true")  # Для стилизации QSS
         return button
     
     def create_menu(self):
@@ -240,17 +244,31 @@ class MainWindow(QMainWindow):
             self.size_slider.setValue(brush_size)
     
     def set_tool(self, tool):
+        # Сбрасываем выделение всех кнопок инструментов
+        self.brush_btn.setChecked(False)
+        self.line_btn.setChecked(False)
+        self.rect_btn.setChecked(False)
+        self.ellipse_btn.setChecked(False)
+        self.eraser_btn.setChecked(False)
+        
+        # Устанавливаем новый инструмент и выделяем кнопку
         self.current_tool = tool
         if tool == "brush":
             self.canvas.set_tool(BrushTool())
+            self.brush_btn.setChecked(True)
         elif tool == "line":
             self.canvas.set_tool(LineTool())
+            self.line_btn.setChecked(True)
         elif tool == "rectangle":
             self.canvas.set_tool(RectangleTool())
+            self.rect_btn.setChecked(True)
         elif tool == "ellipse":
             self.canvas.set_tool(EllipseTool())
+            self.ellipse_btn.setChecked(True)
         elif tool == "eraser":
             self.canvas.set_tool(EraserTool())
+            self.eraser_btn.setChecked(True)
+            
         self.update_status()
         self.settings_manager.set_setting("last_tool", tool)
         
