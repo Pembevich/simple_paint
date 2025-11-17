@@ -5,7 +5,12 @@ from PyQt6.QtGui import QColor
 
 class DatabaseManager:
     def __init__(self):
-        self.db_file = 'paint_history.db'
+        self.data_dir = "data"
+        self.db_file = os.path.join(self.data_dir, 'paint_history.db')
+        
+        # Создаем папку data если её нет
+        os.makedirs(self.data_dir, exist_ok=True)
+        
         self.conn = sqlite3.connect(self.db_file)
         self.create_tables()
 
