@@ -19,7 +19,7 @@ class MainWindow(QMainWindow):
         self.settings_manager = SettingsManager()
         self.db_manager = DatabaseManager()
         self.current_session_id = self.db_manager.start_session()
-        self.setWindowTitle("SimplePaint")
+        self.setWindowTitle("self.setWindowTitle("Простой графический редактор")")
         self.setGeometry(100, 100, 800, 600)
         
         self.current_color = QColor(0, 0, 0)
