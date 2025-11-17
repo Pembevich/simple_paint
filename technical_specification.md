@@ -25,23 +25,33 @@
 
 ```
 simple_paint/
-├── main.py                      # Главный файл для запуска
-├── ui/                          # Папка с файлами интерфейса
-│   ├── main_window.py           # Главное окно
-│   ├── tools_panel.py           # Панель инструментов
-│   └── color_picker.py          # Выбор цвета
-├── models/                      # Папка с моделями данных
-│   └── drawing_model.py         # Логика рисования и инструменты
-├── utils/                       # Вспомогательные модули
-│   ├── file_operations.py       # Работа с файлами
-│   └── settings_manager.py      # Настройки программы
-├── images/                      # Папка для иконок и картинок
-│   ├── brush_icon.png
-│   ├── line_icon.png
-│   └── eraser_icon.png
-├── requirements.txt             # Список зависимостей
-├── README.md                    # Описание проекта
-└── technical_specification.md   # Это файл
+├── main.py # Главный файл для запуска
+├── ui/ # Пользовательский интерфейс
+│ ├── main_window.py
+│ ├── canvas_widget.py
+│ ├── about_dialog.py
+│ └── stats_dialog.py
+├── models/ # Логика приложения
+│ └── drawing_tools.py
+├── utils/ # Вспомогательные модули
+│ ├── file_manager.py
+│ ├── settings_manager.py
+│ └── database.py
+├── data/ # Данные программы
+│ ├── app_settings.json
+│ └── paint_history.db
+├── styles/ # Файлы стилей
+│ └── styles.qss
+├── images/ # Ресурсы программы
+│ ├── brush_icon.png
+│ ├── line_icon.png
+│ ├── rectangle_icon.png
+│ ├── ellipse_icon.png
+│ ├── eraser_icon.png
+│ └── clear_icon.png
+├── requirements.txt
+├── README.md
+└── technical_specification.md
 ```
 
 ### Главное окно при запуске:
