@@ -36,13 +36,17 @@ class MainWindow(QMainWindow):
         
         # Основной layout
         main_layout = QHBoxLayout()
+        main_layout.setContentsMargins(5, 5, 5, 5)
+        main_layout.setSpacing(5)
         central_widget.setLayout(main_layout)
         
-        # Левая панель инструментов
+        # Левая панель инструментов (фиксированная ширина)
         tools_widget = QWidget()
-        tools_widget.setFixedWidth(120)
+        tools_widget.setFixedWidth(100)  # Немного уже для компактности
         tools_widget.setProperty("toolPanel", "true")
         tools_layout = QVBoxLayout(tools_widget)
+        tools_layout.setContentsMargins(2, 2, 2, 2)
+        tools_layout.setSpacing(3)
         
         # Кнопки инструментов с иконками и надписями
         self.brush_btn = self.create_tool_button("images/brush_icon.png", "Кисть")
@@ -62,14 +66,18 @@ class MainWindow(QMainWindow):
         tools_layout.addWidget(self.clear_btn)
         tools_layout.addStretch()
         
-        # Правая часть (холст и настройки)
+        # Правая часть (холст и настройки) - растягивается
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
+        right_layout.setContentsMargins(5, 5, 5, 5)
+        right_layout.setSpacing(5)
         
-        # Панель настроек
+        # Панель настроек (фиксированная высота)
         settings_widget = QWidget()
-        settings_widget.setFixedHeight(60)
+        settings_widget.setFixedHeight(50)
         settings_layout = QHBoxLayout(settings_widget)
+        settings_layout.setContentsMargins(5, 5, 5, 5)
+        settings_layout.setSpacing(10)
         
         settings_layout.addWidget(QLabel("Цвет:"))
         
@@ -79,9 +87,11 @@ class MainWindow(QMainWindow):
         self.green_btn = self.create_color_button("green", "Зеленый")
         self.black_btn = self.create_color_button("black", "Черный")
         
+        # Кнопка "Другой" - расширенная
         self.custom_color_btn = QPushButton("Другой")
-        self.custom_color_btn.setFixedSize(60, 30)
+        self.custom_color_btn.setFixedSize(70, 30)
         self.custom_color_btn.setToolTip("Выбрать другой цвет")
+        self.custom_color_btn.setProperty("customColorButton", "true")  # Новое свойство
         
         settings_layout.addWidget(self.red_btn)
         settings_layout.addWidget(self.blue_btn)
@@ -95,7 +105,7 @@ class MainWindow(QMainWindow):
         self.size_slider = QSlider(Qt.Orientation.Horizontal)
         self.size_slider.setRange(1, 50)
         self.size_slider.setValue(5)
-        self.size_slider.setFixedWidth(100)
+        self.size_slider.setFixedWidth(120)
         settings_layout.addWidget(self.size_slider)
         
         self.size_label = QLabel("5px")
@@ -103,13 +113,20 @@ class MainWindow(QMainWindow):
         
         right_layout.addWidget(settings_widget)
         
-        # Холст (занимает всё оставшееся пространство)
+        # Холст (растягивается на всё доступное пространство)
         self.canvas = CanvasWidget()
         right_layout.addWidget(self.canvas)
         
         # Собираем основное окно
         main_layout.addWidget(tools_widget)
         main_layout.addWidget(right_widget)
+        
+        # Настраиваем растяжение
+        main_layout.setStretchFactor(tools_widget, 0)  # Не растягивается
+        main_layout.setStretchFactor(right_widget, 1)  # Растягивается
+        
+        right_layout.setStretchFactor(settings_widget, 0)  # Не растягивается
+        right_layout.setStretchFactor(self.canvas, 1)      # Растягивается
         
         # Строка состояния
         self.status_bar = QStatusBar()
