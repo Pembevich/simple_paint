@@ -125,31 +125,32 @@ class MainWindow(QMainWindow):
     def create_tool_button(self, icon_path, text):
         """Создает кнопку инструмента с иконкой и текстом"""
         button = QPushButton()
-        
+    
         # Вертикальный layout для кнопки
         layout = QVBoxLayout()
-        layout.setContentsMargins(5, 5, 5, 5)
-        layout.setSpacing(2)
-        
+        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setSpacing(1)
+    
         # Иконка
         icon_label = QLabel()
-        icon_label.setPixmap(QIcon(icon_path).pixmap(32, 32))
+        icon_label.setPixmap(QIcon(icon_path).pixmap(24, 24))
         icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
+    
         # Текст
         text_label = QLabel(text)
         text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        text_label.setStyleSheet("font-size: 10px;")
-        
+        text_label.setStyleSheet("font-size: 9px; font-weight: bold;")
+        text_label.setWordWrap(True)  # Разрешаем перенос слов
+    
         layout.addWidget(icon_label)
         layout.addWidget(text_label)
-        
+    
         button.setLayout(layout)
-        button.setFixedSize(80, 60)
+        button.setFixedSize(90, 60)  # Увеличил ширину
         button.setToolTip(text)
         button.setCheckable(True)
         button.setProperty("toolButton", "true")
-        
+    
         return button
     
     def create_color_button(self, color, tooltip):
