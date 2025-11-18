@@ -7,8 +7,7 @@ class CanvasWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.setMinimumSize(400, 300)
-        self.image = QImage(self.size(), QImage.Format.Format_RGB32)
-        self.image.fill(Qt.GlobalColor.white)
+        self.image = None
         self.drawing = False
         self.last_point = QPoint()
         self.start_point = QPoint()
@@ -16,10 +15,37 @@ class CanvasWidget(QWidget):
         self.current_color = QColor(0, 0, 0)
         self.brush_size = 5
         self.temp_image = None
+        self.create_initial_image()
+
+    def create_initial_image(self):
+        """Создает начальное изображение при инициализации"""
+        self.image = QImage(self.size(), QImage.Format.Format_RGB32)
+        self.image.fill(Qt.GlobalColor.white)
+
+    def resizeEvent(self, event):
+        """Обрабатывает изменение размера виджета"""
+        super().resizeEvent(event)
+        
+        # Создаем новое изображение при изменении размера
+        if self.image:
+            # Сохраняем старое изображение
+            old_image = self.image
+            
+            # Создаем новое изображение с новым размером
+            self.image = QImage(self.size(), QImage.Format.Format_RGB32)
+            self.image.fill(Qt.GlobalColor.white)
+            
+            # Копируем старое изображение в центр нового
+            painter = QPainter(self.image)
+            painter.drawImage(0, 0, old_image)
+            painter.end()
+        
+        self.update()
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.drawImage(self.rect(), self.image, self.rect())
+        if self.image:
+            painter.drawImage(self.rect(), self.image, self.rect())
         
         if self.drawing and self.temp_image:
             painter.drawImage(self.rect(), self.temp_image, self.rect())
@@ -74,8 +100,10 @@ class CanvasWidget(QWidget):
                 print("Заливка не выполнена")
 
     def clear(self):
-        self.image.fill(Qt.GlobalColor.white)
-        self.update()
+        """Очищает холст"""
+        if self.image:
+            self.image.fill(Qt.GlobalColor.white)
+            self.update()
 
     def set_tool(self, tool):
         self.current_tool = tool
