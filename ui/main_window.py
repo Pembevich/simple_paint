@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout,
                              QSizePolicy)
 from PyQt6.QtCore import Qt, QPoint
 from PyQt6.QtGui import QAction, QPainter, QColor, QPen, QImage, QIcon
-from models.drawing_tools import BrushTool, LineTool, RectangleTool, EllipseTool, EraserTool
+from models.drawing_tools import BrushTool, LineTool, RectangleTool, EllipseTool, EraserTool, FillTool
 from utils.settings_manager import SettingsManager
 from utils.database import DatabaseManager
 from ui.canvas_widget import CanvasWidget
@@ -50,6 +50,7 @@ class MainWindow(QMainWindow):
         self.rect_btn = self.create_tool_button("images/rectangle_icon.png", "Прямоугольник")
         self.ellipse_btn = self.create_tool_button("images/ellipse_icon.png", "Эллипс")
         self.eraser_btn = self.create_tool_button("images/eraser_icon.png", "Ластик")
+        self.fill_btn = self.create_tool_button("images/fill_icon.png", "Заливка")
         self.clear_btn = self.create_tool_button("images/clear_icon.png", "Очистить")
         
         tools_layout.addWidget(self.brush_btn)
@@ -57,6 +58,7 @@ class MainWindow(QMainWindow):
         tools_layout.addWidget(self.rect_btn)
         tools_layout.addWidget(self.ellipse_btn)
         tools_layout.addWidget(self.eraser_btn)
+        tools_layout.addWidget(self.fill_btn)
         tools_layout.addWidget(self.clear_btn)
         tools_layout.addStretch()
         
@@ -207,6 +209,7 @@ class MainWindow(QMainWindow):
         self.rect_btn.clicked.connect(lambda: self.set_tool("rectangle"))
         self.ellipse_btn.clicked.connect(lambda: self.set_tool("ellipse"))
         self.eraser_btn.clicked.connect(lambda: self.set_tool("eraser"))
+        self.fill_btn.clicked.connect(lambda: self.set_tool("fill"))
         self.clear_btn.clicked.connect(self.clear_canvas)
         
         # Цвета
@@ -256,6 +259,7 @@ class MainWindow(QMainWindow):
         self.rect_btn.setChecked(False)
         self.ellipse_btn.setChecked(False)
         self.eraser_btn.setChecked(False)
+        self.fill_btn.setChecked(False)
         
         # Устанавливаем новый инструмент и выделяем кнопку
         self.current_tool = tool
@@ -274,6 +278,9 @@ class MainWindow(QMainWindow):
         elif tool == "eraser":
             self.canvas.set_tool(EraserTool())
             self.eraser_btn.setChecked(True)
+        elif tool == "fill":
+            self.canvas.set_tool(FillTool())
+            self.fill_btn.setChecked(True)
             
         self.update_status()
         self.settings_manager.set_setting("last_tool", tool)
