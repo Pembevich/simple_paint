@@ -1,5 +1,6 @@
-from PyQt6.QtGui import QPainter, QPen, QColor
-from PyQt6.QtCore import QPoint, QRect, Qt  # ← ДОБАВИЛ Qt
+from PyQt6.QtGui import QPainter, QPen, QColor, QImage
+from PyQt6.QtCore import QPoint, QRect, Qt
+from collections import deque
 
 class DrawingTool:
     def __init__(self):
@@ -14,7 +15,7 @@ class BrushTool(DrawingTool):
         self.name = "brush"
     
     def draw(self, painter, start_point, end_point, color, brush_size):
-        pen = QPen(color, brush_size, cap=Qt.PenCapStyle.RoundCap)  # ← Теперь Qt определен
+        pen = QPen(color, brush_size, cap=Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
         painter.drawLine(start_point, end_point)
 
@@ -56,7 +57,53 @@ class EraserTool(DrawingTool):
         self.name = "eraser"
     
     def draw(self, painter, start_point, end_point, color, brush_size):
-        # Ластик рисует белым цветом с круглыми концами
         pen = QPen(QColor(255, 255, 255), brush_size, cap=Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
         painter.drawLine(start_point, end_point)
+
+class FillTool(DrawingTool):
+    def __init__(self):
+        super().__init__()
+        self.name = "fill"
+    
+    def draw(self, painter, start_point, end_point, color, brush_size):
+        """Реализация заливки области"""
+        pass
+    
+    def flood_fill(self, image, start_point, new_color):
+        """Алгоритм заливки области (flood fill)"""
+        try:
+            old_color = image.pixelColor(start_point.x(), start_point.y())
+            
+            if old_color == new_color:
+                return False
+            
+            queue = deque([start_point])
+            visited = set()
+            
+            while queue:
+                point = queue.popleft()
+                x, y = point.x(), point.y()
+                
+                # Проверяем границы изображения
+                if (x < 0 or x >= image.width() or 
+                    y < 0 or y >= image.height()):
+                    continue
+                
+                if (x, y) in visited:
+                    continue
+                
+                if image.pixelColor(x, y) != old_color:
+                    continue
+                image.setPixelColor(x, y, new_color)
+                visited.add((x, y))
+                queue.append(QPoint(x + 1, y))
+                queue.append(QPoint(x - 1, y))
+                queue.append(QPoint(x, y + 1))
+                queue.append(QPoint(x, y - 1))
+            
+            return True
+            
+        except Exception as e:
+            print(f"Ошибка при заливке: {e}")
+            return False
