@@ -23,25 +23,22 @@ jobs:
         pip install PyQt6==6.6.1
         pip install pyinstaller==5.13.0
         
-    - name: Create data directory
-      run: |
-        mkdir data
-        mkdir styles
-        mkdir images
-        echo "Directories created"
-        
-    - name: Build EXE with workaround
+    - name: Build EXE with all dependencies
       run: |
         pyinstaller --onefile --windowed --name SimplePaint ^
           --add-data "ui;ui" ^
           --add-data "models;models" ^
           --add-data "utils;utils" ^
           --add-data "images;images" ^
+          --add-data "data;data" ^
+          --add-data "styles;styles" ^
           --hidden-import=PyQt6.QtCore ^
           --hidden-import=PyQt6.QtGui ^
           --hidden-import=PyQt6.QtWidgets ^
           --hidden-import=sqlite3 ^
           --hidden-import=json ^
+          --hidden-import=os ^
+          --hidden-import=datetime ^
           main.py
         
     - name: Upload EXE
