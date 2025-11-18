@@ -2,6 +2,8 @@ name: Build SimplePaint EXE
 
 on: 
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   build-windows:
@@ -17,12 +19,30 @@ jobs:
         
     - name: Install dependencies
       run: |
-        pip install PyQt6 pyinstaller
+        python -m pip install --upgrade pip
+        pip install PyQt6==6.6.1
+        pip install pyinstaller==5.13.0
         
-    - name: Find Qt paths and build
+    - name: Create data directory
       run: |
-        python -c "import PyQt6; print(PyQt6.__file__)"
-        pyinstaller --onefile --windowed --name SimplePaint --collect-binaries PyQt6 --collect-data PyQt6 --collect-submodules PyQt6 main.py
+        mkdir data
+        mkdir styles
+        mkdir images
+        echo "Directories created"
+        
+    - name: Build EXE with workaround
+      run: |
+        pyinstaller --onefile --windowed --name SimplePaint ^
+          --add-data "ui;ui" ^
+          --add-data "models;models" ^
+          --add-data "utils;utils" ^
+          --add-data "images;images" ^
+          --hidden-import=PyQt6.QtCore ^
+          --hidden-import=PyQt6.QtGui ^
+          --hidden-import=PyQt6.QtWidgets ^
+          --hidden-import=sqlite3 ^
+          --hidden-import=json ^
+          main.py
         
     - name: Upload EXE
       uses: actions/upload-artifact@v4
