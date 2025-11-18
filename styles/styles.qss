@@ -1,73 +1,58 @@
-/* Стиль для кнопок инструментов */
+/* Стили для SimplePaint - улучшенные кнопки */
+
+/* Главное окно */
+QMainWindow {
+    background-color: #f5f5f5;
+}
+
+/* Кнопки инструментов - шире с градиентом */
 QPushButton[toolButton="true"] {
-    background-color: #f0f0f0;
-    border: 0px;
-    color: #242424;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #f8f8f8,
+                                stop:0.5 #e8e8e8,
+                                stop:1 #d8d8d8);
+    border: 1px solid #b8b8b8;
     border-radius: 8px;
-    font-size: 14px;
-    padding: 6px 16px;
-    font-weight: 600;
-    text-shadow: 0 1px 0 #fff;
-    
-    /* Множественные тени для 3D эффекта */
-    box-shadow: 
-        inset 0 1px 0 0 #f4f4f4,
-        0 1px 0 0 #efefef,
-        0 2px 0 0 #ececec,
-        0 4px 0 0 #e0e0e0,
-        0 5px 0 0 #dedede,
-        0 6px 0 0 #dcdcdc,
-        0 7px 0 0 #cacaca,
-        0 7px 8px 0 #cecece;
+    color: #242424;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 8px 4px;
+    min-width: 90px;
+    min-height: 60px;
+    max-width: 90px;
+    max-height: 60px;
 }
 
 QPushButton[toolButton="true"]:hover {
-    background-color: #f8f8f8;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #f0f0f0,
+                                stop:0.5 #e0e0e0,
+                                stop:1 #d0d0d0);
+    border: 1px solid #a0a0a0;
 }
 
 QPushButton[toolButton="true"]:pressed {
-    background-color: #e8e8e8;
-    /* Сдвиг и уменьшение теней при нажатии */
-    position: relative;
-    top: 4px;
-    box-shadow: 
-        inset 0 1px 0 0 #f4f4f4,
-        0 1px 0 0 #efefef,
-        0 2px 0 0 #ececec,
-        0 3px 0 0 #e0e0e0,
-        0 3px 0 0 #dedede,
-        0 4px 0 0 #dcdcdc,
-        0 4px 0 0 #cacaca,
-        0 4px 6px 0 #cecece;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #e0e0e0,
+                                stop:0.5 #d0d0d0,
+                                stop:1 #c0c0c0);
+    border: 1px solid #888888;
 }
 
 QPushButton[toolButton="true"]:checked {
-    background-color: #0078d7;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #4090ff,
+                                stop:0.5 #0078d7,
+                                stop:1 #0066b4);
     color: white;
-    text-shadow: 0 1px 0 #005a9e;
-    box-shadow: 
-        inset 0 1px 0 0 #0098ff,
-        0 1px 0 0 #0066b4,
-        0 2px 0 0 #005a9e,
-        0 4px 0 0 #004d84,
-        0 5px 0 0 #004170,
-        0 6px 0 0 #00385c,
-        0 7px 0 0 #002f48,
-        0 7px 8px 0 #003c5c;
+    border: 2px solid #005a9e;
 }
 
-QPushButton[toolButton="true"]:checked:pressed {
-    background-color: #0066b4;
-    top: 4px;
-    box-shadow: 
-        inset 0 1px 0 0 #0088ff,
-        0 1px 0 0 #005a9e,
-        0 2px 0 0 #004d84,
-        0 3px 0 0 #004170,
-        0 3px 0 0 #00385c,
-        0 4px 0 0 #002f48,
-        0 4px 0 0 #00263a,
-        0 4px 6px 0 #003c5c;
+QPushButton[toolButton="true"]:checked:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #5098ff,
+                                stop:0.5 #1085e0,
+                                stop:1 #0074cc);
 }
 
 /* Кнопки цветов */
@@ -84,55 +69,152 @@ QPushButton[colorButton="true"]:hover {
     border: 2px solid #999999;
 }
 
-/* Обычные кнопки (Сохранить, Открыть и т.д.) */
+/* Обычные кнопки */
 QPushButton {
-    background-color: #f0f0f0;
-    border: 0px;
-    color: #242424;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #f8f8f8,
+                                stop:0.5 #e8e8e8,
+                                stop:1 #d8d8d8);
+    border: 1px solid #b8b8b8;
     border-radius: 6px;
+    color: #242424;
     font-size: 13px;
-    padding: 5px 12px;
-    font-weight: 500;
-    text-shadow: 0 1px 0 #fff;
-    box-shadow: 
-        inset 0 1px 0 0 #f4f4f4,
-        0 1px 0 0 #efefef,
-        0 2px 0 0 #ececec,
-        0 3px 0 0 #e0e0e0,
-        0 3px 0 0 #dedede,
-        0 4px 0 0 #dcdcdc,
-        0 5px 0 0 #cacaca,
-        0 5px 6px 0 #cecece;
+    font-weight: bold;
+    padding: 6px 12px;
+    min-height: 30px;
 }
 
 QPushButton:hover {
-    background-color: #f8f8f8;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #f0f0f0,
+                                stop:0.5 #e0e0e0,
+                                stop:1 #d0d0d0);
+    border: 1px solid #a0a0a0;
 }
 
 QPushButton:pressed {
-    background-color: #e8e8e8;
-    position: relative;
-    top: 3px;
-    box-shadow: 
-        inset 0 1px 0 0 #f4f4f4,
-        0 1px 0 0 #efefef,
-        0 1px 0 0 #ececec,
-        0 2px 0 0 #e0e0e0,
-        0 2px 0 0 #dedede,
-        0 3px 0 0 #dcdcdc,
-        0 3px 0 0 #cacaca,
-        0 3px 4px 0 #cecece;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #e0e0e0,
+                                stop:0.5 #d0d0d0,
+                                stop:1 #c0c0c0);
+    border: 1px solid #888888;
 }
 
-/* Главное окно */
-QMainWindow {
-    background-color: #f5f5f5;
+/* Слайдер */
+QSlider::groove:horizontal {
+    border: 1px solid #999999;
+    height: 8px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                                stop:0 #c8c8c8, 
+                                stop:1 #d8d8d8);
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
+                                stop:0 #4090ff, 
+                                stop:1 #0078d7);
+    border: 1px solid #005a9e;
+    width: 18px;
+    margin: -5px 0;
+    border-radius: 9px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
+                                stop:0 #5098ff, 
+                                stop:1 #1085e0);
+}
+
+/* Метки */
+QLabel {
+    color: #333333;
+    background: transparent;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* Строка состояния */
+QStatusBar {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #e8e8e8,
+                                stop:1 #d8d8d8);
+    color: #555555;
+    border-top: 1px solid #cccccc;
+    font-size: 12px;
+}
+
+/* Меню */
+QMenuBar {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #f0f0f0,
+                                stop:1 #e0e0e0);
+    color: #333333;
+    border-bottom: 1px solid #cccccc;
+    font-weight: bold;
+}
+
+QMenuBar::item {
+    background: transparent;
+    padding: 6px 12px;
+}
+
+QMenuBar::item:selected {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #4090ff,
+                                stop:1 #0078d7);
+    color: white;
+    border-radius: 4px;
+}
+
+QMenu {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #f8f8f8,
+                                stop:1 #e8e8e8);
+    color: #333333;
+    border: 1px solid #b8b8b8;
+    border-radius: 6px;
+}
+
+QMenu::item {
+    padding: 6px 20px;
+    border-radius: 4px;
+}
+
+QMenu::item:selected {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #4090ff,
+                                stop:1 #0078d7);
+    color: white;
+}
+
+/* Диалоговые окна */
+QDialog {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #f0f0f0,
+                                stop:1 #e5e5e5);
+    color: #333333;
+}
+
+QMessageBox {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #f0f0f0,
+                                stop:1 #e5e5e5);
+    color: #333333;
 }
 
 /* Холст */
 CanvasWidget {
     background-color: white;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
+    border: 2px solid #b8b8b8;
+    border-radius: 6px;
 }
-/* ВСЕ КОММЕНТАРИИ НУЖНЫ ИСКЛЮЧИТЕЛЬНО ДЛЯ МЕНЯ ЧТОБЫ В БУДУЩЕМ НЕ ЗАПУТАТЬСЯ */
+
+/* Панель инструментов */
+QWidget[toolPanel="true"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #e8e8e8,
+                                stop:1 #f0f0f0);
+    border-right: 2px solid #b8b8b8;
+    padding: 5px;
+}
