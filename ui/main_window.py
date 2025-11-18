@@ -42,10 +42,10 @@ class MainWindow(QMainWindow):
         
         # Левая панель инструментов (фиксированная ширина)
         tools_widget = QWidget()
-        tools_widget.setFixedWidth(100)  # Немного уже для компактности
+        tools_widget.setFixedWidth(85)
         tools_widget.setProperty("toolPanel", "true")
         tools_layout = QVBoxLayout(tools_widget)
-        tools_layout.setContentsMargins(2, 2, 2, 2)
+        tools_layout.setContentsMargins(3, 3, 3, 3)
         tools_layout.setSpacing(3)
         
         # Кнопки инструментов с иконками и надписями
@@ -69,7 +69,7 @@ class MainWindow(QMainWindow):
         # Правая часть (холст и настройки) - растягивается
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
-        right_layout.setContentsMargins(5, 5, 5, 5)
+        right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(5)
         
         # Панель настроек (фиксированная высота)
@@ -87,11 +87,11 @@ class MainWindow(QMainWindow):
         self.green_btn = self.create_color_button("green", "Зеленый")
         self.black_btn = self.create_color_button("black", "Черный")
         
-        # Кнопка "Другой" - расширенная
+        # Кнопка "Другой"
         self.custom_color_btn = QPushButton("Другой")
         self.custom_color_btn.setFixedSize(70, 30)
         self.custom_color_btn.setToolTip("Выбрать другой цвет")
-        self.custom_color_btn.setProperty("customColorButton", "true")  # Новое свойство
+        self.custom_color_btn.setProperty("customColorButton", "true")
         
         settings_layout.addWidget(self.red_btn)
         settings_layout.addWidget(self.blue_btn)
@@ -122,11 +122,8 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(right_widget)
         
         # Настраиваем растяжение
-        main_layout.setStretchFactor(tools_widget, 0)  # Не растягивается
-        main_layout.setStretchFactor(right_widget, 1)  # Растягивается
-        
-        right_layout.setStretchFactor(settings_widget, 0)  # Не растягивается
-        right_layout.setStretchFactor(self.canvas, 1)      # Растягивается
+        main_layout.setStretch(0, 0)  # Панель инструментов не растягивается
+        main_layout.setStretch(1, 1)  # Правая часть растягивается
         
         # Строка состояния
         self.status_bar = QStatusBar()
@@ -142,32 +139,34 @@ class MainWindow(QMainWindow):
     def create_tool_button(self, icon_path, text):
         """Создает кнопку инструмента с иконкой и текстом"""
         button = QPushButton()
-    
+        
         # Вертикальный layout для кнопки
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
         layout.setSpacing(1)
-    
-        # Иконка
+        
+        # Иконка (компактная)
         icon_label = QLabel()
-        icon_label.setPixmap(QIcon(icon_path).pixmap(24, 24))
+        icon_label.setPixmap(QIcon(icon_path).pixmap(18, 18))
         icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    
-        # Текст
+        icon_label.setFixedHeight(20)
+        
+        # Текст (компактный)
         text_label = QLabel(text)
         text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        text_label.setStyleSheet("font-size: 9px; font-weight: bold;")
-        text_label.setWordWrap(True)  # Разрешаем перенос слов
-    
+        text_label.setStyleSheet("font-size: 7px; font-weight: bold;")
+        text_label.setWordWrap(True)
+        text_label.setFixedHeight(14)
+        
         layout.addWidget(icon_label)
         layout.addWidget(text_label)
-    
+        
         button.setLayout(layout)
-        button.setFixedSize(90, 60)  # Увеличил ширину
+        button.setFixedSize(75, 45)
         button.setToolTip(text)
         button.setCheckable(True)
         button.setProperty("toolButton", "true")
-    
+        
         return button
     
     def create_color_button(self, color, tooltip):
