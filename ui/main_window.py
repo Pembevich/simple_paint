@@ -178,9 +178,30 @@ class MainWindow(QMainWindow):
         button.setProperty("colorButton", "true")
         return button
     
+    def toggle_styles(self):
+    """Переключает стили интерфейса"""
+    app = QApplication.instance()
+    
+    if self.toggle_style_action.isChecked():
+        # Включаем стили
+        if os.path.exists("styles/styles.qss"):
+            try:
+                style_file = QFile("styles/styles.qss")
+                if style_file.open(QFile.OpenModeFlag.ReadOnly | QFile.OpenModeFlag.Text):
+                    stream = QTextStream(style_file)
+                    app.setStyleSheet(stream.readAll())
+                    style_file.close()
+                    print("Стили включены")
+            except Exception as e:
+                print(f"Ошибка загрузки стилей: {e}")
+    else:
+        # Выключаем стили (стандартный вид Qt)
+        app.setStyleSheet("")
+        print("Стили отключены")
+    
     def create_menu(self):
         menubar = self.menuBar()
-    
+        
         # Меню Файл
         file_menu = menubar.addMenu("Файл")
         
@@ -227,7 +248,7 @@ class MainWindow(QMainWindow):
         about_action.triggered.connect(self.show_about)
         stats_action.triggered.connect(self.show_stats)
         self.toggle_style_action.triggered.connect(self.toggle_styles)  # Новый сигнал
-    
+        
     def connect_signals(self):
         # Инструменты
         self.brush_btn.clicked.connect(lambda: self.set_tool("brush"))
