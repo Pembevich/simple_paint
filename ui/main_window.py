@@ -1,9 +1,11 @@
-from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QPushButton, QLabel, 
-                             QSlider, QMenuBar, QStatusBar, 
+import os
+
+from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout,
+                             QHBoxLayout, QPushButton, QLabel,
+                             QSlider, QMenuBar, QStatusBar,
                              QMessageBox, QFileDialog, QColorDialog,
-                             QSizePolicy)
-from PyQt6.QtCore import Qt, QPoint
+                             QSizePolicy, QApplication)
+from PyQt6.QtCore import Qt, QPoint, QFile, QTextStream
 from PyQt6.QtGui import QAction, QPainter, QColor, QPen, QImage, QIcon
 from models.drawing_tools import BrushTool, LineTool, RectangleTool, EllipseTool, EraserTool, FillTool
 from utils.settings_manager import SettingsManager
@@ -89,7 +91,7 @@ class MainWindow(QMainWindow):
         
         # Кнопка "Другой" - увеличиваем
         self.custom_color_btn = QPushButton("Другой цвет")
-        self.custom_color_btn.setFixedSize(90, 30)  # Увеличили
+        self.custom_color_btn.setFixedSize(130, 60)  # Увеличили
         self.custom_color_btn.setToolTip("Выбрать другой цвет")
         self.custom_color_btn.setProperty("customColorButton", "true")
         
@@ -190,25 +192,25 @@ class MainWindow(QMainWindow):
         return button
     
     def toggle_styles(self):
-    """Переключает стили интерфейса"""
-    app = QApplication.instance()
-    
-    if self.toggle_style_action.isChecked():
-        # Включаем стили
-        if os.path.exists("styles/styles.qss"):
-            try:
-                style_file = QFile("styles/styles.qss")
-                if style_file.open(QFile.OpenModeFlag.ReadOnly | QFile.OpenModeFlag.Text):
-                    stream = QTextStream(style_file)
-                    app.setStyleSheet(stream.readAll())
-                    style_file.close()
-                    print("Стили включены")
-            except Exception as e:
-                print(f"Ошибка загрузки стилей: {e}")
-    else:
-        # Выключаем стили (стандартный вид Qt)
-        app.setStyleSheet("")
-        print("Стили отключены")
+        """Переключает стили интерфейса"""
+        app = QApplication.instance()
+
+        if self.toggle_style_action.isChecked():
+            # Включаем стили
+            if os.path.exists("styles/styles.qss"):
+                try:
+                    style_file = QFile("styles/styles.qss")
+                    if style_file.open(QFile.OpenModeFlag.ReadOnly | QFile.OpenModeFlag.Text):
+                        stream = QTextStream(style_file)
+                        app.setStyleSheet(stream.readAll())
+                        style_file.close()
+                        print("Стили включены")
+                except Exception as e:
+                    print(f"Ошибка загрузки стилей: {e}")
+        else:
+            # Выключаем стили (стандартный вид Qt)
+            app.setStyleSheet("")
+            print("Стили отключены")
     
     def create_menu(self):
         menubar = self.menuBar()
