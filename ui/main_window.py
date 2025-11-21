@@ -142,27 +142,27 @@ class MainWindow(QMainWindow):
         
         # Вертикальный layout для кнопки
         layout = QVBoxLayout()
-        layout.setContentsMargins(2, 2, 2, 2)
-        layout.setSpacing(1)
+        layout.setContentsMargins(3, 3, 3, 3)
+        layout.setSpacing(2)
         
-        # Иконка (компактная)
+        # Иконка (увеличиваем)
         icon_label = QLabel()
-        icon_label.setPixmap(QIcon(icon_path).pixmap(18, 18))
+        icon_label.setPixmap(QIcon(icon_path).pixmap(28, 28))  # Увеличили до 28x28
         icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        icon_label.setFixedHeight(20)
+        icon_label.setFixedHeight(30)
         
-        # Текст (компактный)
+        # Текст (увеличиваем шрифт)
         text_label = QLabel(text)
         text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        text_label.setStyleSheet("font-size: 7px; font-weight: bold;")
+        text_label.setStyleSheet("font-size: 10px; font-weight: bold;")
         text_label.setWordWrap(True)
-        text_label.setFixedHeight(14)
+        text_label.setFixedHeight(20)
         
         layout.addWidget(icon_label)
         layout.addWidget(text_label)
         
         button.setLayout(layout)
-        button.setFixedSize(75, 45)
+        button.setFixedSize(120, 70)  # Увеличили: 120x70 вместо 75x50
         button.setToolTip(text)
         button.setCheckable(True)
         button.setProperty("toolButton", "true")
