@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
     
     def create_menu(self):
         menubar = self.menuBar()
-        
+    
         # Меню Файл
         file_menu = menubar.addMenu("Файл")
         
@@ -203,7 +203,15 @@ class MainWindow(QMainWindow):
         edit_menu = menubar.addMenu("Правка")
         self.clear_action = QAction("Очистить", self)
         self.clear_action.setShortcut("Ctrl+Shift+N")
+        
+        # Новый пункт - Сменить стиль
+        self.toggle_style_action = QAction("Сменить стиль", self)
+        self.toggle_style_action.setShortcut("Ctrl+L")
+        self.toggle_style_action.setCheckable(True)
+        self.toggle_style_action.setChecked(True)  # Стиль включен по умолчанию
+        
         edit_menu.addAction(self.clear_action)
+        edit_menu.addAction(self.toggle_style_action)  # Добавляем новый пункт
         
         # Меню Справка
         help_menu = menubar.addMenu("Справка")
@@ -214,10 +222,11 @@ class MainWindow(QMainWindow):
         help_menu.addAction(about_action)
         help_menu.addAction(stats_action)
         
-        # Подключаем выход и о программе
+        # Подключаем сигналы
         exit_action.triggered.connect(self.close)
         about_action.triggered.connect(self.show_about)
         stats_action.triggered.connect(self.show_stats)
+        self.toggle_style_action.triggered.connect(self.toggle_styles)  # Новый сигнал
     
     def connect_signals(self):
         # Инструменты
