@@ -6,7 +6,7 @@ from models.drawing_tools import BrushTool, LineTool, RectangleTool, EllipseTool
 class CanvasWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.setMinimumSize(400, 300)
+        self.setMinimumSize(300, 250)
         self.image = None
         self.drawing = False
         self.last_point = QPoint()
