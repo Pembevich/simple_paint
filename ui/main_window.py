@@ -58,6 +58,7 @@ class MainWindow(QMainWindow):
         self.eraser_btn = self.create_tool_button("images/eraser_icon.png", "Ластик")
         self.fill_btn = self.create_tool_button("images/fill_icon.png", "Заливка")
         self.clear_btn = self.create_tool_button("images/clear_icon.png", "Очистить")
+        self.clear_btn.setCheckable(False)
         
         tools_layout.addWidget(self.brush_btn)
         tools_layout.addWidget(self.line_btn)
